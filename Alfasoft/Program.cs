@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Alfasoft.Model;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -30,18 +32,28 @@ namespace Alfasoft
                 requisicaoWeb.Method = "GET";
                 requisicaoWeb.ContentType = "application/x-www-form-urlencoded";
                 requisicaoWeb.UserAgent = "JuvenalViana";
-                //ler e exibir a resposta
-                using (var resposta = requisicaoWeb.GetResponse())
+                try
                 {
-                    var streamDados = resposta.GetResponseStream();
-                    StreamReader reader1 = new StreamReader(streamDados);
-                    object objResponse = reader1.ReadToEnd();
 
-                    Console.WriteLine(objResponse.ToString());
+                    using (var resposta = requisicaoWeb.GetResponse())
+                    {
+                        var streamDados = resposta.GetResponseStream();
+                        StreamReader reader1 = new StreamReader(streamDados);
+                        object objResponse = reader1.ReadToEnd();
+
+                        User result = JsonConvert.DeserializeObject<User>(objResponse.ToString());
+
+                        Console.WriteLine(objResponse.ToString());
+                        Thread.Sleep(5000);
+                        streamDados.Close();
+                        resposta.Close();
+
+                    }
+                }
+                catch (WebException we) {
+                    HttpWebResponse response = (HttpWebResponse)we.Response;
+                    Console.WriteLine("User "+user+" not found.");
                     Thread.Sleep(5000);
-                    streamDados.Close();
-                    resposta.Close();
-
                 }
 
             }            
